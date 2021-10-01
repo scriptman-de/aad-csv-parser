@@ -1,0 +1,21 @@
+{
+  "name": "aad-csvjs",
+  "version": "1.0.0",
+  "description": "Parse (ASV-, SNV-)CSV data for use in Azure Active Directory",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "export-teacher": "node Convert-Teacher.js",
+    "export-pupils": "node Convert-Pupils.js"
+  },
+  "dependencies": {
+    "papaparse": "^5.3.1"
+  },
+  "keywords": [],
+  "author": "Martin Aulenbach <info@scriptman.de>",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/papaparse": "^5.2.6",
+    "typescript": "^4.4.2"
+  }
+}
