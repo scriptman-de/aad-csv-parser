@@ -1,11 +1,12 @@
 import * as Papa from "papaparse"
 import * as fs from "fs"
+import * as _ from "lodash"
 
 type inputArray = {
-    Vorname: string;
-    Nachname: string;
-    Anmeldename: string;
     Klasse: string;
+    Name: string;
+    Erziehungsberechtigter: string;
+    Zustimmung: string;
 }
 
 type outputArray = {
@@ -28,9 +29,9 @@ type outputArray = {
 }
 
 const papaInputConfig = {
- delimiter: ";",
- header: true, 
- skipEmptyLines: true,
+    delimiter: ";",
+    header: true,
+    skipEmptyLines: true,
 }
 
 const papaOutputConfig = {
@@ -57,28 +58,38 @@ const papaOutputConfig = {
 }
 
 try {
-    const filedata = fs.readFileSync("./Schueler-2021-22.csv", "utf8")
+    const filedata = fs.readFileSync("./GYMVHH-2021-Schueler-MS365-umfrageergebnis.csv", "utf8")
     let inputCsv = Papa.parse<inputArray>(filedata, papaInputConfig)
     const outputArr: outputArray[] = []
 
     inputCsv.data.forEach((value) => {
-        let username = value.Vorname.substr(0,1) + "." + value.Nachname
-        username = username.replace("ä", "ae").replace("ö", "oe").replace("ü", "ue").replace("ß", "ss").replace(/\s*/g, "").toLowerCase()
-        
-        let displayName = value.Nachname + " " + value.Vorname.substr(0,1) + "."
+        let name = value.Name.trim().split(", ");
+        let username = name[1].trim() + "." + name[0].trim();
+        username = username
+          .replace("ä", "ae")
+          .replace("ö", "oe")
+          .replace("ü", "ue")
+          .replace("ß", "ss")
+          .replace(/\s*/g, "")
+          .toLowerCase();
+
+        let displayName = name[0] + " " + name[1]
+
         outputArr.push({
             Anzeigename: displayName,
-            Benutzername: `${username}@gymvhh.onmicrosoft.com`,
-            Nachname: value.Nachname,
-            Vorname: value.Vorname,
+            Benutzername: `${username}@gymvhh.de`,
+            Nachname: name[0],
+            Vorname: name[1],
             Abteilung: value.Klasse
         })
     })
 
+    let orderedoutput = _.orderBy(outputArr, ["Abteilung","Anzeigename"], ["asc", "asc"])
+
     var outputcsv = Papa.unparse(outputArr, papaOutputConfig)
-    
-    fs.writeFileSync("aad-pupils-output.csv", outputcsv)
-    
-} catch(err) {
+
+    fs.writeFileSync("GYMVHH-AAD-Schueler-importdatei.csv", outputcsv)
+
+} catch (err) {
     console.error("could not read file")
 }
